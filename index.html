@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Average Number Calculator</title>
+    <style>
+        body {
+            background-color: black;
+            color: darkgreen;
+            font-family: Arial, sans-serif;
+        }
+        #result, #probabilities {
+            margin-top: 15px;
+            font-size: 20px;
+        }
+        input {
+            background-color: darkgreen;
+            color: black;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+        }
+        h2 {
+            color: darkgreen;
+        }
+    </style>
+</head>
+<body>
+    <h2>Average Number Calculator</h2>
+    <label for="numberInput">Enter a number:</label><br>
+    <input type="text" id="numberInput" name="numberInput" oninput="calculateAverage()"><br>
+
+    <div id="result"></div>
+    <div id="probabilities"></div>
+
+    <script>
+        function calculateAverage() {
+            // The numbers in the pool
+            var numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10];
+
+            // Get the number entered by the user
+            var number = document.getElementById("numberInput").value;
+
+            // Check if the input is a number
+            if (isNaN(number) || number == "") {
+                document.getElementById("result").innerText = "Please enter a valid number.";
+                return;
+            }
+
+            // Add the entered number to the pool
+            numbers.push(Number(number));
+
+            // Calculate the sum of the numbers
+            var sum = numbers.reduce(function(a, b) {
+                return a + b;
+            });
+
+            // Calculate the average
+            var average = sum / numbers.length;
+
+            // Display the result
+            document.getElementById("result").innerText = "The average number is " + average.toFixed(2) + ".";
+
+            // Calculate probabilities
+            var countUnder21 = 0;
+            var countOver21 = 0;
+            var countExactly21 = 0;
+
+            for(var i=0; i<numbers.length; i++) {
+                if(numbers[i] < 21) countUnder21++;
+                else if(numbers[i] > 21) countOver21++;
+                else if(numbers[i] == 21) countExactly21++;
+            }
+
+            var probabilityUnder21 = (countUnder21 / numbers.length * 100).toFixed(2);
+            var probabilityOver21 = (countOver21 / numbers.length * 100).toFixed(2);
+            var probabilityExactly21 = (countExactly21 / numbers.length * 100).toFixed(2);
+
+            // Display probabilities
+            document.getElementById("probabilities").innerHTML = "Chance of being under 21: " + probabilityUnder21 + "%<br>" 
+            + "Chance of being exactly 21: " + probabilityExactly21 + "%<br>"
+            + "Chance of being over 21: " + probabilityOver21 + "%";
+        }
+    </script>
+</body>
+</html>
