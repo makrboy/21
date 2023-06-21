@@ -61,8 +61,8 @@
                 return;
             }
 
-            let combinedAvg = (inputValue + avg) / 2;
-            document.getElementById('output1').textContent = 'Combined average: ' + combinedAvg.toFixed(2);
+            let sumWithAvg = inputValue + avg;
+            document.getElementById('output1').textContent = 'Input plus average of pool: ' + sumWithAvg.toFixed(2);
 
             let below21 = 0;
             let exactly21 = 0;
