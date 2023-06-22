@@ -17,6 +17,10 @@
             box-sizing: border-box;
         }
 
+        .risk-label {
+            font-size: calc(10px + 2vmin);
+        }
+
         input, .slider {
             background-color: #000000;
             color: #006400;
@@ -26,6 +30,27 @@
             font-size: calc(15px + 3vmin);
             width: 80%;
             padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            height: 15px;
+            border-radius: 5px;
+            background: #006400;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #000000;
+            cursor: pointer;
         }
 
         .button-grid {
@@ -37,8 +62,8 @@
         }
 
         button {
-            background-color: #006400;
-            color: #000000;
+            background-color: #003300;
+            color: #FFFFFF;
             border: none;
             padding: 15px;
             font-size: calc(15px + 3vmin);
@@ -58,7 +83,7 @@
     </style>
 </head>
 <body>
-    <p>Risk level:</p>
+    <p class="risk-label">Risk level: <span id="riskValue">0</span></p>
     <input id="riskLevel" type="range" min="0" max="100" step="5" value="0" class="slider">
 
     <div class="button-grid">
@@ -74,7 +99,7 @@
         <button onclick="addNumber(10)">10</button>
     </div>
 
-    <input id="myInput" type="text" placeholder="Type a number here...">
+    <input id="myInput" type="text" placeholder="Current hand total">
     <div id="output">
         <p id="output1"></p>
         <p id="output2"></p>
@@ -99,6 +124,7 @@
         });
 
         document.getElementById('riskLevel').addEventListener('input', function(e) {
+            document.getElementById('riskValue').innerText = e.target.value;
             updateOutput(document.getElementById('myInput').value);
         });
 
