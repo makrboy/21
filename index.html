@@ -28,12 +28,21 @@
             color: #006400;
             border: none;
             border-bottom: 2px solid #006400;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-size: calc(15px + 3vmin);
             width: 80%;
             padding: 15px;
             box-sizing: border-box;
             outline: none;
+        }
+
+        input:focus {
+            border-bottom: 2px solid #006400;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: #006400;
         }
 
         .slider {
@@ -61,7 +70,7 @@
             grid-template-columns: repeat(5, 1fr);
             gap: 10px;
             width: 80%;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         button {
@@ -77,15 +86,15 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 30px;
+            gap: 10px;
             width: 80%;
-            height: calc(100% - 300px);
+            height: calc(100% - 280px);
             justify-content: space-between;
         }
 
         #output p {
             margin: 0;
-            min-height: 30px;
+            min-height: 20px;
         }
     </style>
 </head>
