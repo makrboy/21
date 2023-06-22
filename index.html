@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body {
             background-color: #000000;
@@ -123,6 +124,11 @@
             overflow: auto;
             height: auto;
         }
+
+        .reset-button {
+            background-color: #000000;
+            color: #006400;
+        }
     </style>
 </head>
 <body>
@@ -132,7 +138,8 @@
     <input id="riskLevel" type="range" min="0" max="100" step="5" value="0" class="slider">
 
     <div class="action-buttons">
-        <button id="lockButton" onclick="toggleLock()">Unlock Input</button>
+        <button id="lockButton" onclick="toggleLock()">Lock Input</button>
+        <button onclick="resetTextBox()" class="reset-button">Reset Text</button>
         <button onclick="resetDeck()">Reset Deck</button>
     </div>
 
@@ -159,13 +166,13 @@
         <p id="output5"></p>
     </div>
 
-    <p class="deck-list-toggle" onclick="toggleDeckList()">Show Deck</p>
+    <p class="deck-list-toggle" onclick="toggleDeckList()">Show List</p>
     <div class="deck-container" id="deckContainer" style="display: none;"></div>
 
     <script>
         let singleDeck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
         let deck = singleDeck.concat(singleDeck, singleDeck, singleDeck);
-        let inputLock = false;
+        let inputLock = true;
 
         function updateAverage() {
             let sum = deck.reduce((a, b) => a + b, 0);
@@ -206,16 +213,23 @@
 
         function toggleLock() {
             inputLock = !inputLock;
-            document.getElementById('lockButton').textContent = inputLock ? 'Unlock Input' : 'Lock Input';
+            document.getElementById('lockButton').textContent = inputLock ? 'Lock Input' : 'Unlock Input';
         }
 
         function toggleDeckList() {
             let deckContainer = document.getElementById('deckContainer');
             if (deckContainer.style.display === 'none') {
                 deckContainer.style.display = 'block';
+                document.querySelector('.deck-list-toggle').textContent = 'Hide List';
             } else {
                 deckContainer.style.display = 'none';
+                document.querySelector('.deck-list-toggle').textContent = 'Show List';
             }
+        }
+
+        function resetTextBox() {
+            document.getElementById('myInput').value = '';
+            updateOutput('');
         }
 
         document.getElementById('myInput').addEventListener('input', function(e) {
