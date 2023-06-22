@@ -17,7 +17,7 @@
             box-sizing: border-box;
         }
 
-        input {
+        input, .slider {
             background-color: #000000;
             color: #006400;
             border: none;
@@ -26,6 +26,23 @@
             font-size: calc(15px + 3vmin);
             width: 80%;
             padding: 15px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            width: 80%;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background-color: #006400;
+            color: #000000;
+            border: none;
+            padding: 15px;
+            font-size: calc(15px + 3vmin);
+            cursor: pointer;
         }
 
         #output {
@@ -41,12 +58,29 @@
     </style>
 </head>
 <body>
-    <input id="myInput" type="text" placeholder="Curent hand total...">
+    <p>Risk level:</p>
+    <input id="riskLevel" type="range" min="0" max="100" step="5" value="0" class="slider">
+
+    <div class="button-grid">
+        <button onclick="addNumber(1)">1</button>
+        <button onclick="addNumber(2)">2</button>
+        <button onclick="addNumber(3)">3</button>
+        <button onclick="addNumber(4)">4</button>
+        <button onclick="addNumber(5)">5</button>
+        <button onclick="addNumber(6)">6</button>
+        <button onclick="addNumber(7)">7</button>
+        <button onclick="addNumber(8)">8</button>
+        <button onclick="addNumber(9)">9</button>
+        <button onclick="addNumber(10)">10</button>
+    </div>
+
+    <input id="myInput" type="text" placeholder="Type a number here...">
     <div id="output">
         <p id="output1"></p>
         <p id="output2"></p>
         <p id="output3"></p>
         <p id="output4"></p>
+        <p id="output5"></p>
     </div>
 
     <script>
@@ -54,21 +88,35 @@
         let sum = numbers.reduce((a, b) => a + b, 0);
         let avg = sum / numbers.length;
 
+        function addNumber(num) {
+            let inputField = document.getElementById('myInput');
+            inputField.value = parseFloat(inputField.value || '0') + num;
+            updateOutput(inputField.value);
+        }
+
         document.getElementById('myInput').addEventListener('input', function(e) {
-            let inputValue = parseFloat(e.target.value);
-            if (isNaN(inputValue)) {
+            updateOutput(e.target.value);
+        });
+
+        document.getElementById('riskLevel').addEventListener('input', function(e) {
+            updateOutput(document.getElementById('myInput').value);
+        });
+
+        function updateOutput(inputValue) {
+            let inputValueFloat = parseFloat(inputValue);
+            if (isNaN(inputValueFloat)) {
                 clearOutput();
                 return;
             }
 
-            let sumWithAvg = inputValue + avg;
+            let sumWithAvg = inputValueFloat + avg;
             document.getElementById('output1').textContent = 'Input plus average of pool: ' + sumWithAvg.toFixed(2);
 
             let below21 = 0;
             let exactly21 = 0;
             let above21 = 0;
             numbers.forEach(num => {
-                let sum = num + inputValue;
+                let sum = num + inputValueFloat;
                 if(sum < 21) {
                     below21++;
                 } else if(sum === 21) {
@@ -79,16 +127,25 @@
             });
 
             let total = numbers.length;
+            let above21Perc = (above21 / total) * 100;
             document.getElementById('output2').textContent = 'Chance of being below 21: ' + ((below21/total) * 100).toFixed(2) + '%';
             document.getElementById('output3').textContent = 'Chance of being exactly 21: ' + ((exactly21/total) * 100).toFixed(2) + '%';
-            document.getElementById('output4').textContent = 'Chance of being above 21: ' + ((above21/total) * 100).toFixed(2) + '%';
-        });
+            document.getElementById('output4').textContent = 'Chance of being above 21: ' + above21Perc.toFixed(2) + '%';
+
+            let riskLevel = parseInt(document.getElementById('riskLevel').value);
+            if (above21Perc > riskLevel) {
+                document.getElementById('output5').textContent = 'Based on your risk level, you should not proceed.';
+            } else {
+                document.getElementById('output5').textContent = 'Based on your risk level, you can proceed.';
+            }
+        }
 
         function clearOutput() {
             document.getElementById('output1').textContent = '';
             document.getElementById('output2').textContent = '';
             document.getElementById('output3').textContent = '';
             document.getElementById('output4').textContent = '';
+            document.getElementById('output5').textContent = '';
         }
     </script>
 </body>
