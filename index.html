@@ -104,54 +104,12 @@
             margin: 0;
             min-height: 15px;
         }
-
-        .toggle-button {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            width: 80%;
-        }
-
-        .toggle-button input {
-            display: none;
-        }
-
-        .toggle-button label {
-            display: block;
-            width: 60px;
-            height: 34px;
-            position: relative;
-            background-color: #006400;
-            border-radius: 34px;
-        }
-
-        .toggle-button label:after {
-            content: "";
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 30px;
-            height: 30px;
-            background-color: #000000;
-            border-radius: 50%;
-            transition: 0.3s;
-        }
-
-        .toggle-button input:checked + label:after {
-            transform: translateX(26px);
-        }
     </style>
 </head>
 <body>
     <div class="title">21 Calculator</div>
 
-    <div class="toggle-button">
-        <span>Input lock:</span>
-        <input type="checkbox" id="toggle" />
-        <label for="toggle"></label>
-    </div>
-
+    <button id="lockButton" onclick="toggleLock()">Unlock Input</button>
     <button onclick="resetDeck()">Reset Deck</button>
 
     <p class="risk-label">Risk level: <span id="riskValue">0</span></p>
@@ -180,11 +138,13 @@
         <p id="output5"></p>
     </div>
 
-    <div class="deck-container" id="deckContainer"></div>
+    <button onclick="toggleDeckList()">Show Deck</button>
+    <div class="deck-container" id="deckContainer" style="display: none;"></div>
 
     <script>
         let singleDeck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
         let deck = singleDeck.concat(singleDeck, singleDeck, singleDeck); 
+        let inputLock = false;
 
         function updateAverage() {
             let sum = deck.reduce((a, b) => a + b, 0);
@@ -192,11 +152,18 @@
         }
 
         function updateDeckDisplay() {
-            document.getElementById('deckContainer').innerHTML = 'Deck: ' + deck.join(', ');
+            let deckCount = {};
+            for (let num of deck) {
+                deckCount[num] = (deckCount[num] || 0) + 1;
+            }
+            let output = '';
+            for (let [num, count] of Object.entries(deckCount)) {
+                output += num + '*' + count + ' ';
+            }
+            document.getElementById('deckContainer').textContent = 'Deck: ' + output;
         }
 
         function addNumber(num) {
-            let inputLock = document.getElementById('toggle').checked;
             if (inputLock) {
                 return;
             }
@@ -215,6 +182,20 @@
         function resetDeck() {
             deck = singleDeck.concat(singleDeck, singleDeck, singleDeck); 
             updateDeckDisplay();
+        }
+
+        function toggleLock() {
+            inputLock = !inputLock;
+            document.getElementById('lockButton').textContent = inputLock ? 'Unlock Input' : 'Lock Input';
+        }
+
+        function toggleDeckList() {
+            let deckContainer = document.getElementById('deckContainer');
+            if (deckContainer.style.display === 'none') {
+                deckContainer.style.display = 'block';
+            } else {
+                deckContainer.style.display = 'none';
+            }
         }
 
         document.getElementById('myInput').addEventListener('input', function(e) {
