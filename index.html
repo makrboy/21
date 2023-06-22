@@ -7,7 +7,6 @@
             color: #006400;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
             font-family: Arial, sans-serif;
             font-size: calc(15px + 3vmin);
@@ -27,7 +26,7 @@
             color: #006400;
         }
 
-        input, .slider {
+        input, .slider, .deck-container {
             background-color: #000000;
             color: #006400;
             border: none;
@@ -86,6 +85,11 @@
             cursor: pointer;
         }
 
+        .deck-container {
+            overflow: auto;
+            height: 100px;
+        }
+
         #output {
             display: flex;
             flex-direction: column;
@@ -101,33 +105,54 @@
             min-height: 15px;
         }
 
-        .deck-list {
-            background-color: #000000;
-            color: #006400;
-            width: 80%;
-            padding: 10px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .deck-list h3 {
-            margin: 0;
-            padding: 0;
+        .toggle-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             cursor: pointer;
+            width: 80%;
         }
 
-        .deck-list ul {
-            padding: 0;
-            list-style-type: none;
-        }
-
-        .collapsed {
+        .toggle-button input {
             display: none;
+        }
+
+        .toggle-button label {
+            display: block;
+            width: 60px;
+            height: 34px;
+            position: relative;
+            background-color: #006400;
+            border-radius: 34px;
+        }
+
+        .toggle-button label:after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 30px;
+            height: 30px;
+            background-color: #000000;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-button input:checked + label:after {
+            transform: translateX(26px);
         }
     </style>
 </head>
 <body>
     <div class="title">21 Calculator</div>
+
+    <div class="toggle-button">
+        <span>Input lock:</span>
+        <input type="checkbox" id="toggle" />
+        <label for="toggle"></label>
+    </div>
+
+    <button onclick="resetDeck()">Reset Deck</button>
 
     <p class="risk-label">Risk level: <span id="riskValue">0</span></p>
     <input id="riskLevel" type="range" min="0" max="100" step="5" value="0" class="slider">
@@ -147,10 +172,6 @@
 
     <input id="myInput" type="text" placeholder="Current hand total">
 
-    <button onclick="rebuildDeck()">Rebuild Deck</button>
-    <label for="toggleNumbers">Toggle Numbers</label>
-    <input id="toggleNumbers" type="checkbox" onclick="toggleNumberButtons()">
-    
     <div id="output">
         <p id="output1"></p>
         <p id="output2"></p>
@@ -159,19 +180,31 @@
         <p id="output5"></p>
     </div>
 
-    <div class="deck-list">
-        <h3 onclick="toggleDeckList()">Deck Contents</h3>
-        <ul id="deckContents" class="collapsed"></ul>
-    </div>
+    <div class="deck-container" id="deckContainer"></div>
 
     <script>
-        let numbers = [1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10];
-        let sum = numbers.reduce((a, b) => a + b, 0);
-        let avg = sum / numbers.length;
+        let singleDeck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
+        let deck = singleDeck.concat(singleDeck, singleDeck, singleDeck); 
+
+        function updateAverage() {
+            let sum = deck.reduce((a, b) => a + b, 0);
+            return sum / deck.length;
+        }
+
+        function updateDeckDisplay() {
+            document.getElementById('deckContainer').innerHTML = 'Deck: ' + deck.join(', ');
+        }
 
         function addNumber(num) {
-            if (document.getElementById('toggleNumbers').checked) {
+            let inputLock = document.getElementById('toggle').checked;
+            if (inputLock) {
                 return;
+            }
+
+            let index = deck.indexOf(num);
+            if (index > -1) {
+                deck.splice(index, 1);
+                updateDeckDisplay();
             }
 
             let inputField = document.getElementById('myInput');
@@ -179,34 +212,9 @@
             updateOutput(inputField.value);
         }
 
-        function rebuildDeck() {
-            numbers = [1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10];
-            updateOutput(document.getElementById('myInput').value);
-            updateDeckList();
-        }
-
-        function toggleNumberButtons() {
-            let toggleNumbers = document.getElementById('toggleNumbers');
-            let buttons = document.getElementsByClassName('button-grid')[0].getElementsByTagName('button');
-            for (let i = 0; i < buttons.length; i++) {
-                buttons[i].disabled = toggleNumbers.checked;
-            }
-        }
-
-        function updateDeckList() {
-            let deckContents = document.getElementById('deckContents');
-            deckContents.innerHTML = '';
-
-            for (let i = 0; i < numbers.length; i++) {
-                let li = document.createElement('li');
-                li.textContent = numbers[i];
-                deckContents.appendChild(li);
-            }
-        }
-
-        function toggleDeckList() {
-            let deckContents = document.getElementById('deckContents');
-            deckContents.classList.toggle('collapsed');
+        function resetDeck() {
+            deck = singleDeck.concat(singleDeck, singleDeck, singleDeck); 
+            updateDeckDisplay();
         }
 
         document.getElementById('myInput').addEventListener('input', function(e) {
@@ -219,6 +227,7 @@
         });
 
         function updateOutput(inputValue) {
+            let avg = updateAverage();
             let inputValueFloat = parseFloat(inputValue);
             if (isNaN(inputValueFloat)) {
                 clearOutput();
@@ -231,7 +240,7 @@
             let below21 = 0;
             let exactly21 = 0;
             let above21 = 0;
-            numbers.forEach(num => {
+            deck.forEach(num => {
                 let sum = num + inputValueFloat;
                 if(sum < 21) {
                     below21++;
@@ -242,7 +251,7 @@
                 }
             });
 
-            let total = numbers.length;
+            let total = deck.length;
             let above21Perc = (above21 / total) * 100;
             document.getElementById('output2').textContent = 'Chance of being below 21: ' + ((below21/total) * 100).toFixed(2) + '%';
             document.getElementById('output3').textContent = 'Chance of being exactly 21: ' + ((exactly21/total) * 100).toFixed(2) + '%';
@@ -264,7 +273,7 @@
             document.getElementById('output5').textContent = '';
         }
 
-        updateDeckList();
+        updateDeckDisplay();
     </script>
 </body>
 </html>
