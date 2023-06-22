@@ -109,6 +109,7 @@
             display: flex;
             justify-content: space-between;
             width: 80%;
+            margin-bottom: 15px;
         }
 
         .deck-list-toggle {
@@ -200,11 +201,12 @@
         function resetDeck() {
             deck = singleDeck.concat(singleDeck, singleDeck, singleDeck);
             updateDeckDisplay();
+            updateOutput(document.getElementById('myInput').value);
         }
 
         function toggleLock() {
             inputLock = !inputLock;
-            document.getElementById('lockButton').textContent = inputLock ? 'Lock Input' : 'Unlock Input';
+            document.getElementById('lockButton').textContent = inputLock ? 'Unlock Input' : 'Lock Input';
         }
 
         function toggleDeckList() {
