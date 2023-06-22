@@ -100,6 +100,39 @@
             margin: 0;
             min-height: 15px;
         }
+
+        .deck-list {
+            width: 80%;
+            margin-top: 20px;
+            border: 1px solid #006400;
+            padding: 10px;
+            font-size: calc(15px + 3vmin);
+            overflow: hidden;
+        }
+
+        .deck-list ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .deck-list li {
+            margin-bottom: 5px;
+        }
+
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .content {
+            display: none;
+            overflow: hidden;
+        }
+
+        .active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -130,15 +163,64 @@
         <p id="output5"></p>
     </div>
 
+    <button id="rebuildButton" onclick="rebuildDeck()">Rebuild Deck</button>
+    <button id="toggleButton" onclick="toggleInput()">Toggle Input</button>
+
+    <div class="deck-list collapsible">
+        <div class="collapsible" onclick="toggleCollapse()">Current Deck Contents</div>
+        <div class="content" id="deckContent"></div>
+    </div>
+
     <script>
         let numbers = [1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10];
         let sum = numbers.reduce((a, b) => a + b, 0);
         let avg = sum / numbers.length;
 
         function addNumber(num) {
+            if (document.getElementById("toggleButton").classList.contains("active")) {
+                return;
+            }
+
             let inputField = document.getElementById('myInput');
             inputField.value = parseFloat(inputField.value || '0') + num;
             updateOutput(inputField.value);
+            removeNumberFromDeck(num);
+        }
+
+        function removeNumberFromDeck(num) {
+            let index = numbers.indexOf(num);
+            if (index !== -1) {
+                numbers.splice(index, 1);
+                rebuildDeck();
+            }
+        }
+
+        function rebuildDeck() {
+            numbers = [1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10];
+            updateDeckList();
+            updateOutput(document.getElementById('myInput').value);
+        }
+
+        function toggleInput() {
+            let toggleButton = document.getElementById("toggleButton");
+            toggleButton.classList.toggle("active");
+        }
+
+        function toggleCollapse() {
+            let deckContent = document.getElementById("deckContent");
+            deckContent.classList.toggle("active");
+        }
+
+        function updateDeckList() {
+            let deckContent = document.getElementById("deckContent");
+            let deckList = document.createElement("ul");
+            for (let i = 0; i < numbers.length; i++) {
+                let listItem = document.createElement("li");
+                listItem.textContent = numbers[i];
+                deckList.appendChild(listItem);
+            }
+            deckContent.innerHTML = "";
+            deckContent.appendChild(deckList);
         }
 
         document.getElementById('myInput').addEventListener('input', function(e) {
@@ -195,6 +277,8 @@
             document.getElementById('output4').textContent = '';
             document.getElementById('output5').textContent = '';
         }
+
+        updateDeckList();
     </script>
 </body>
 </html>
