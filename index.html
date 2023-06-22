@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body {
             background-color: #000000;
@@ -15,6 +14,8 @@
             padding: 0;
             box-sizing: border-box;
             overflow: hidden;
+            touch-action: manipulation;
+            -ms-touch-action: manipulation;
         }
 
         .title {
@@ -126,8 +127,18 @@
         }
 
         .reset-button {
-            background-color: #000000;
-            color: #006400;
+            background-color: #006400;
+            color: #000000;
+            border: none;
+            padding: 10px;
+            font-size: calc(15px + 3vmin);
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .reset-button-container {
+            display: flex;
+            align-items: center;
         }
     </style>
 </head>
@@ -138,9 +149,11 @@
     <input id="riskLevel" type="range" min="0" max="100" step="5" value="0" class="slider">
 
     <div class="action-buttons">
-        <button id="lockButton" onclick="toggleLock()">Lock Input</button>
-        <button onclick="resetTextBox()" class="reset-button">Reset Text</button>
-        <button onclick="resetDeck()">Reset Deck</button>
+        <button id="lockButton" onclick="toggleLock()">Unlock Input</button>
+        <div class="reset-button-container">
+            <button onclick="resetInput()">Reset Text</button>
+            <button onclick="resetDeck()">Reset Deck</button>
+        </div>
     </div>
 
     <div class="button-grid">
@@ -213,7 +226,12 @@
 
         function toggleLock() {
             inputLock = !inputLock;
-            document.getElementById('lockButton').textContent = inputLock ? 'Lock Input' : 'Unlock Input';
+            document.getElementById('lockButton').textContent = inputLock ? 'Unlock Input' : 'Lock Input';
+        }
+
+        function resetInput() {
+            document.getElementById('myInput').value = '';
+            updateOutput('');
         }
 
         function toggleDeckList() {
@@ -225,11 +243,6 @@
                 deckContainer.style.display = 'none';
                 document.querySelector('.deck-list-toggle').textContent = 'Show List';
             }
-        }
-
-        function resetTextBox() {
-            document.getElementById('myInput').value = '';
-            updateOutput('');
         }
 
         document.getElementById('myInput').addEventListener('input', function(e) {
