@@ -3,6 +3,8 @@
 <head>
     <style>
         body {
+            user-select: none;
+            -webkit-touch-callout: none;
             background-color: #000000;
             color: #006400;
             display: flex;
@@ -14,7 +16,12 @@
             padding: 0;
             box-sizing: border-box;
             overflow: hidden;
-            touch-action: manipulation;
+        }
+
+        button, 
+        input[type="range"], 
+        .deck-container {
+            outline: none;
         }
 
         .title {
@@ -133,8 +140,8 @@
     <input id="riskLevel" type="range" min="0" max="100" step="5" value="0" class="slider">
 
     <div class="action-buttons">
-        <button id="lockButton" onclick="toggleLock()">Lock Input</button>
-        <button onclick="resetTextBox()">Reset Textbox</button>
+        <button id="lockButton" onclick="toggleLock()">Unlock Input</button>
+        <button id="resetTextbox" onclick="resetTextbox()">Reset Textbox</button>
         <button onclick="resetDeck()">Reset Deck</button>
     </div>
 
@@ -161,7 +168,7 @@
         <p id="output5"></p>
     </div>
 
-    <p class="deck-list-toggle" id="toggleText" onclick="toggleDeckList()">Show Deck</p>
+    <p class="deck-list-toggle" id="deckListToggle" onclick="toggleDeckList()">Show Deck</p>
     <div class="deck-container" id="deckContainer" style="display: none;"></div>
 
     <script>
@@ -206,7 +213,7 @@
             updateOutput(document.getElementById('myInput').value);
         }
 
-        function resetTextBox() {
+        function resetTextbox() {
             document.getElementById('myInput').value = "";
             clearOutput();
         }
@@ -218,73 +225,15 @@
 
         function toggleDeckList() {
             let deckContainer = document.getElementById('deckContainer');
-            let toggleText = document.getElementById('toggleText');
+            let deckListToggle = document.getElementById('deckListToggle');
             if (deckContainer.style.display === 'none') {
                 deckContainer.style.display = 'block';
-                toggleText.textContent = 'Hide Deck';
+                deckListToggle.textContent = 'Hide Deck';
             } else {
                 deckContainer.style.display = 'none';
-                toggleText.textContent = 'Show Deck';
+                deckListToggle.textContent = 'Show Deck';
             }
         }
-
-        document.getElementById('myInput').addEventListener('input', function(e) {
-            updateOutput(e.target.value);
-        });
-
-        document.getElementById('riskLevel').addEventListener('input', function(e) {
-            document.getElementById('riskValue').innerText = e.target.value;
-            updateOutput(document.getElementById('myInput').value);
-        });
-
-        function updateOutput(value) {
-            let inputValueFloat = parseFloat(value);
-            if (isNaN(inputValueFloat)) {
-                clearOutput();
-                return;
-            }
-
-            let avg = updateAverage();
-            let sumWithAvg = inputValueFloat + avg;
-            document.getElementById('output1').textContent = 'Input plus average of pool: ' + sumWithAvg.toFixed(2);
-
-            let below21 = 0;
-            let exactly21 = 0;
-            let above21 = 0;
-            deck.forEach(num => {
-                let sum = num + inputValueFloat;
-                if(sum < 21) {
-                    below21++;
-                } else if(sum === 21) {
-                    exactly21++;
-                } else {
-                    above21++;
-                }
-            });
-
-            let total = deck.length;
-            let above21Perc = (above21 / total) * 100;
-            document.getElementById('output2').textContent = 'Chance of being below 21: ' + ((below21/total) * 100).toFixed(2) + '%';
-            document.getElementById('output3').textContent = 'Chance of being exactly 21: ' + ((exactly21/total) * 100).toFixed(2) + '%';
-            document.getElementById('output4').textContent = 'Chance of being above 21: ' + above21Perc.toFixed(2) + '%';
-
-            let riskLevel = parseInt(document.getElementById('riskLevel').value);
-            if (above21Perc > riskLevel) {
-                document.getElementById('output5').textContent = 'Based on your risk level, you should not proceed.';
-            } else {
-                document.getElementById('output5').textContent = 'Based on your risk level, you can proceed.';
-            }
-        }
-
-        function clearOutput() {
-            document.getElementById('output1').textContent = '';
-            document.getElementById('output2').textContent = '';
-            document.getElementById('output3').textContent = '';
-            document.getElementById('output4').textContent = '';
-            document.getElementById('output5').textContent = '';
-        }
-
-        updateDeckDisplay();
     </script>
 </body>
 </html>
