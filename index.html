@@ -102,36 +102,27 @@
         }
 
         .deck-list {
+            background-color: #000000;
+            color: #006400;
             width: 80%;
-            margin-top: 20px;
-            border: 1px solid #006400;
             padding: 10px;
-            font-size: calc(15px + 3vmin);
+            margin-bottom: 20px;
             overflow: hidden;
+        }
+
+        .deck-list h3 {
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
         }
 
         .deck-list ul {
-            list-style-type: none;
             padding: 0;
-            margin: 0;
+            list-style-type: none;
         }
 
-        .deck-list li {
-            margin-bottom: 5px;
-        }
-
-        .collapsible {
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .content {
+        .collapsed {
             display: none;
-            overflow: hidden;
-        }
-
-        .active {
-            display: block;
         }
     </style>
 </head>
@@ -155,6 +146,11 @@
     </div>
 
     <input id="myInput" type="text" placeholder="Current hand total">
+
+    <button onclick="rebuildDeck()">Rebuild Deck</button>
+    <label for="toggleNumbers">Toggle Numbers</label>
+    <input id="toggleNumbers" type="checkbox" onclick="toggleNumberButtons()">
+    
     <div id="output">
         <p id="output1"></p>
         <p id="output2"></p>
@@ -163,12 +159,9 @@
         <p id="output5"></p>
     </div>
 
-    <button id="rebuildButton" onclick="rebuildDeck()">Rebuild Deck</button>
-    <button id="toggleButton" onclick="toggleInput()">Toggle Input</button>
-
-    <div class="deck-list collapsible">
-        <div class="collapsible" onclick="toggleCollapse()">Current Deck Contents</div>
-        <div class="content" id="deckContent"></div>
+    <div class="deck-list">
+        <h3 onclick="toggleDeckList()">Deck Contents</h3>
+        <ul id="deckContents" class="collapsed"></ul>
     </div>
 
     <script>
@@ -177,50 +170,43 @@
         let avg = sum / numbers.length;
 
         function addNumber(num) {
-            if (document.getElementById("toggleButton").classList.contains("active")) {
+            if (document.getElementById('toggleNumbers').checked) {
                 return;
             }
 
             let inputField = document.getElementById('myInput');
             inputField.value = parseFloat(inputField.value || '0') + num;
             updateOutput(inputField.value);
-            removeNumberFromDeck(num);
-        }
-
-        function removeNumberFromDeck(num) {
-            let index = numbers.indexOf(num);
-            if (index !== -1) {
-                numbers.splice(index, 1);
-                rebuildDeck();
-            }
         }
 
         function rebuildDeck() {
             numbers = [1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10];
-            updateDeckList();
             updateOutput(document.getElementById('myInput').value);
+            updateDeckList();
         }
 
-        function toggleInput() {
-            let toggleButton = document.getElementById("toggleButton");
-            toggleButton.classList.toggle("active");
-        }
-
-        function toggleCollapse() {
-            let deckContent = document.getElementById("deckContent");
-            deckContent.classList.toggle("active");
+        function toggleNumberButtons() {
+            let toggleNumbers = document.getElementById('toggleNumbers');
+            let buttons = document.getElementsByClassName('button-grid')[0].getElementsByTagName('button');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = toggleNumbers.checked;
+            }
         }
 
         function updateDeckList() {
-            let deckContent = document.getElementById("deckContent");
-            let deckList = document.createElement("ul");
+            let deckContents = document.getElementById('deckContents');
+            deckContents.innerHTML = '';
+
             for (let i = 0; i < numbers.length; i++) {
-                let listItem = document.createElement("li");
-                listItem.textContent = numbers[i];
-                deckList.appendChild(listItem);
+                let li = document.createElement('li');
+                li.textContent = numbers[i];
+                deckContents.appendChild(li);
             }
-            deckContent.innerHTML = "";
-            deckContent.appendChild(deckList);
+        }
+
+        function toggleDeckList() {
+            let deckContents = document.getElementById('deckContents');
+            deckContents.classList.toggle('collapsed');
         }
 
         document.getElementById('myInput').addEventListener('input', function(e) {
