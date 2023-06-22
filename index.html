@@ -104,16 +104,36 @@
             margin: 0;
             min-height: 15px;
         }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+        }
+
+        .deck-list-toggle {
+            color: #006400;
+            cursor: pointer;
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+
+        .deck-container {
+            overflow: auto;
+            height: auto;
+        }
     </style>
 </head>
 <body>
     <div class="title">21 Calculator</div>
 
-    <button id="lockButton" onclick="toggleLock()">Unlock Input</button>
-    <button onclick="resetDeck()">Reset Deck</button>
-
-    <p class="risk-label">Risk level: <span id="riskValue">0</span></p>
+    <p class="risk-label">Target risk level: <span id="riskValue">0</span></p>
     <input id="riskLevel" type="range" min="0" max="100" step="5" value="0" class="slider">
+
+    <div class="action-buttons">
+        <button id="lockButton" onclick="toggleLock()">Unlock Input</button>
+        <button onclick="resetDeck()">Reset Deck</button>
+    </div>
 
     <div class="button-grid">
         <button onclick="addNumber(1)">1</button>
@@ -138,12 +158,12 @@
         <p id="output5"></p>
     </div>
 
-    <button onclick="toggleDeckList()">Show Deck</button>
+    <p class="deck-list-toggle" onclick="toggleDeckList()">Show Deck</p>
     <div class="deck-container" id="deckContainer" style="display: none;"></div>
 
     <script>
         let singleDeck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
-        let deck = singleDeck.concat(singleDeck, singleDeck, singleDeck); 
+        let deck = singleDeck.concat(singleDeck, singleDeck, singleDeck);
         let inputLock = false;
 
         function updateAverage() {
@@ -164,10 +184,6 @@
         }
 
         function addNumber(num) {
-            if (inputLock) {
-                return;
-            }
-
             let index = deck.indexOf(num);
             if (index > -1) {
                 deck.splice(index, 1);
@@ -175,18 +191,20 @@
             }
 
             let inputField = document.getElementById('myInput');
-            inputField.value = parseFloat(inputField.value || '0') + num;
+            if (!inputLock) {
+                inputField.value = parseFloat(inputField.value || '0') + num;
+            }
             updateOutput(inputField.value);
         }
 
         function resetDeck() {
-            deck = singleDeck.concat(singleDeck, singleDeck, singleDeck); 
+            deck = singleDeck.concat(singleDeck, singleDeck, singleDeck);
             updateDeckDisplay();
         }
 
         function toggleLock() {
             inputLock = !inputLock;
-            document.getElementById('lockButton').textContent = inputLock ? 'Unlock Input' : 'Lock Input';
+            document.getElementById('lockButton').textContent = inputLock ? 'Lock Input' : 'Unlock Input';
         }
 
         function toggleDeckList() {
@@ -207,14 +225,14 @@
             updateOutput(document.getElementById('myInput').value);
         });
 
-        function updateOutput(inputValue) {
-            let avg = updateAverage();
-            let inputValueFloat = parseFloat(inputValue);
+        function updateOutput(value) {
+            let inputValueFloat = parseFloat(value);
             if (isNaN(inputValueFloat)) {
                 clearOutput();
                 return;
             }
 
+            let avg = updateAverage();
             let sumWithAvg = inputValueFloat + avg;
             document.getElementById('output1').textContent = 'Input plus average of pool: ' + sumWithAvg.toFixed(2);
 
