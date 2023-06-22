@@ -3,135 +3,89 @@
 <head>
     <style>
         body {
-            background-color: #000000;
+            background-color: black;
             color: #006400;
+            font-size: calc(10px + 2vmin);
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-family: Arial, sans-serif;
-            font-size: calc(15px + 3vmin);
+            justify-content: center;
+            text-align: center;
+            height: 100vh;
             margin: 0;
-            padding: 0;
-            box-sizing: border-box;
             overflow: hidden;
-        }
-
-        .title {
-            font-size: calc(20px + 4vmin);
-            margin-bottom: 20px;
-        }
-
-        .risk-label {
-            font-size: calc(15px + 3vmin);
-            color: #006400;
-        }
-
-        input, .slider, .deck-container {
-            background-color: #000000;
-            color: #006400;
-            border: none;
-            border-bottom: 2px solid #006400;
-            margin-bottom: 15px;
-            font-size: calc(15px + 3vmin);
-            width: 80%;
-            padding: 10px;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        input:focus {
-            border-bottom: 2px solid #006400;
-            outline: none;
-        }
-
-        input::placeholder {
-            color: #006400;
-        }
-
-        .slider {
-            -webkit-appearance: none;
-            height: 15px;
-            border-radius: 5px;
-            background: #006400;
-            outline: none;
-            opacity: 0.7;
-            transition: opacity .2s;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #000000;
-            cursor: pointer;
         }
 
         .button-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 10px;
-            width: 80%;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .control-grid {
+            display: flex;
+            justify-content: space-around;
+            width: 90%;
+            margin-bottom: 20px;
         }
 
         button {
             background-color: #006400;
-            color: #000000;
-            border: none;
+            color: black;
+            font-size: 1em;
             padding: 10px;
-            font-size: calc(15px + 3vmin);
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-        .deck-container {
-            overflow: auto;
-            height: 100px;
+        button:hover {
+            background-color: #009900;
         }
 
-        #output {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 5px;
-            width: 80%;
-            height: calc(100% - 250px);
-            justify-content: space-around;
+        input[type=text] {
+            color: #006400;
+            border: 2px solid #006400;
+            border-radius: 5px;
+            padding: 5px;
+            width: 90%;
+            margin-bottom: 20px;
         }
 
         #output p {
-            margin: 0;
-            min-height: 15px;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            width: 80%;
-            margin-bottom: 15px;
+            margin: 5px 0;
         }
 
         .deck-list-toggle {
-            color: #006400;
             cursor: pointer;
             margin-bottom: 10px;
-            text-decoration: underline;
         }
 
         .deck-container {
-            overflow: auto;
+            text-align: left;
+            border: 2px solid #006400;
+            border-radius: 5px;
+            padding: 10px;
+            width: 90%;
             height: auto;
+            overflow: auto;
+        }
+
+        h1 {
+            color: #006400;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="title">21 Calculator</div>
+    <h1>21 Calculator</h1>
 
-    <p class="risk-label">Target risk level: <span id="riskValue">0</span></p>
-    <input id="riskLevel" type="range" min="0" max="100" step="5" value="0" class="slider">
+    <input type="range" min="0" max="100" value="50" class="slider" id="riskLevel">
+    <p>Target Risk Level: <span id="riskValue">50</span></p>
 
-    <div class="action-buttons">
+    <div class="control-grid">
         <button id="lockButton" onclick="toggleLock()">Unlock Input</button>
         <button onclick="resetDeck()">Reset Deck</button>
     </div>
@@ -159,72 +113,62 @@
         <p id="output5"></p>
     </div>
 
-    <p class="deck-list-toggle" onclick="toggleDeckList()">Show Deck</p>
-    <div class="deck-container" id="deckContainer" style="display: none;"></div>
+    <p class="deck-list-toggle" id="toggleButton" onclick="toggleDeckList()">Show Deck List</p>
+    <div class="deck-container" id="deckList" style="display: none;"></div>
 
     <script>
-        let singleDeck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
-        let deck = singleDeck.concat(singleDeck, singleDeck, singleDeck);
-        let inputLock = false;
+        let originalDeck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10].flatMap(i => Array(4).fill(i));
+        let deck = [...originalDeck];
+        let lock = false;
 
-        function updateAverage() {
-            let sum = deck.reduce((a, b) => a + b, 0);
-            return sum / deck.length;
+        function resetDeck() {
+            deck = [...originalDeck];
+            updateDeckDisplay();
+            updateOutput(document.getElementById('myInput').value);
         }
 
-        function updateDeckDisplay() {
-            let deckCount = {};
-            for (let num of deck) {
-                deckCount[num] = (deckCount[num] || 0) + 1;
-            }
-            let output = '';
-            for (let [num, count] of Object.entries(deckCount)) {
-                output += num + '*' + count + ' ';
-            }
-            document.getElementById('deckContainer').textContent = 'Deck: ' + output;
+        function toggleLock() {
+            lock = !lock;
+            document.getElementById('lockButton').textContent = lock ? 'Unlock Input' : 'Lock Input';
         }
 
         function addNumber(num) {
             let index = deck.indexOf(num);
             if (index > -1) {
                 deck.splice(index, 1);
-                updateDeckDisplay();
             }
-
-            let inputField = document.getElementById('myInput');
-            if (!inputLock) {
-                inputField.value = parseFloat(inputField.value || '0') + num;
-            }
-            updateOutput(inputField.value);
-        }
-
-        function resetDeck() {
-            deck = singleDeck.concat(singleDeck, singleDeck, singleDeck);
             updateDeckDisplay();
-            updateOutput(document.getElementById('myInput').value);
+            if(!lock) {
+                let inputElement = document.getElementById('myInput');
+                inputElement.value = parseFloat(inputElement.value || '0') + num;
+                updateOutput(document.getElementById('myInput').value);
+            }
         }
 
-        function toggleLock() {
-            inputLock = !inputLock;
-            document.getElementById('lockButton').textContent = inputLock ? 'Unlock Input' : 'Lock Input';
+        function updateDeckDisplay() {
+            let groupedDeck = deck.reduce((acc, num) => (acc[num] = (acc[num] || 0) + 1, acc), {});
+            let deckList = Object.entries(groupedDeck).map(([card, count]) => `${card}*${count}`).join(', ');
+            document.getElementById('deckList').textContent = deckList;
         }
 
         function toggleDeckList() {
-            let deckContainer = document.getElementById('deckContainer');
-            if (deckContainer.style.display === 'none') {
-                deckContainer.style.display = 'block';
+            let deckListElement = document.getElementById('deckList');
+            let toggleButton = document.getElementById('toggleButton');
+            if (deckListElement.style.display === 'none') {
+                deckListElement.style.display = 'block';
+                toggleButton.textContent = 'Hide Deck List';
             } else {
-                deckContainer.style.display = 'none';
+                deckListElement.style.display = 'none';
+                toggleButton.textContent = 'Show Deck List';
             }
         }
 
-        document.getElementById('myInput').addEventListener('input', function(e) {
-            updateOutput(e.target.value);
+        document.getElementById('riskLevel').addEventListener('input', function(e) {
+            document.getElementById('riskValue').textContent = e.target.value;
         });
 
-        document.getElementById('riskLevel').addEventListener('input', function(e) {
-            document.getElementById('riskValue').innerText = e.target.value;
-            updateOutput(document.getElementById('myInput').value);
+        document.getElementById('myInput').addEventListener('input', function(e) {
+            updateOutput(e.target.value);
         });
 
         function updateOutput(value) {
@@ -234,7 +178,7 @@
                 return;
             }
 
-            let avg = updateAverage();
+            let avg = originalDeck.reduce((acc, val) => acc + val) / originalDeck.length;
             let sumWithAvg = inputValueFloat + avg;
             document.getElementById('output1').textContent = 'Input plus average of pool: ' + sumWithAvg.toFixed(2);
 
@@ -258,23 +202,17 @@
             document.getElementById('output3').textContent = 'Chance of being exactly 21: ' + ((exactly21/total) * 100).toFixed(2) + '%';
             document.getElementById('output4').textContent = 'Chance of being above 21: ' + above21Perc.toFixed(2) + '%';
 
-            let riskLevel = parseInt(document.getElementById('riskLevel').value);
-            if (above21Perc > riskLevel) {
-                document.getElementById('output5').textContent = 'Based on your risk level, you should not proceed.';
-            } else {
-                document.getElementById('output5').textContent = 'Based on your risk level, you can proceed.';
-            }
+            let riskLevel = parseInt(document.getElementById('riskLevel').value, 10);
+            document.getElementById('output5').textContent = 'Should you draw another card? ' + (above21Perc > riskLevel ? 'No' : 'Yes');
         }
 
         function clearOutput() {
-            document.getElementById('output1').textContent = '';
-            document.getElementById('output2').textContent = '';
-            document.getElementById('output3').textContent = '';
-            document.getElementById('output4').textContent = '';
-            document.getElementById('output5').textContent = '';
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('output' + i).textContent = '';
+            }
         }
 
-        updateDeckDisplay();
+        resetDeck();
     </script>
 </body>
 </html>
