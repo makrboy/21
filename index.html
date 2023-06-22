@@ -17,6 +17,11 @@
             overflow: hidden;
         }
 
+        .title {
+            font-size: calc(20px + 4vmin);
+            margin-bottom: 20px;
+        }
+
         .risk-label {
             font-size: calc(15px + 3vmin);
             color: #006400;
@@ -73,7 +78,7 @@
         }
 
         button {
-            background-color: #003300;
+            background-color: #006400;
             color: #000000;
             border: none;
             padding: 10px;
@@ -98,6 +103,8 @@
     </style>
 </head>
 <body>
+    <div class="title">21 Calculator</div>
+
     <p class="risk-label">Risk level: <span id="riskValue">0</span></p>
     <input id="riskLevel" type="range" min="0" max="100" step="5" value="0" class="slider">
 
